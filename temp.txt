@@ -1,0 +1,6 @@
+for (let index = 0; index < 500; index++) {
+    workerT.push((resolve, reject) => {
+         return  resolve( SubjectModel.create({subjectName : "testtiong"}))
+    })
+}
+//await Promise.all(workerT.map(rpomiseFn => new Promise(rpomiseFn)))
