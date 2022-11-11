@@ -5,17 +5,20 @@ import { blogEndpoint, authEndpoint } from "../../endpoints/index";
 import FetchingBlog from "../../fetching/blogClass";
 import FetchingAuth from "../../fetching/authClass";
 import QuestionCard from "../../components/QuestionCard";
-import Loading from "../../components/Loading"
+import Loading from "../../components/Loading";
 
 const Subject = ({ authData, payload }) => {
   const { state, dispatch } = useContext(Context);
   const [myAuthData, setMyAuthData] = useState({});
   const [questionData, setQuestionData] = useState("");
+  const [errorData, setErrorData] = useState("");
+  const blogWorker = new FetchingBlog(blogEndpoint);
   const router = useRouter();
 
   useEffect(() => {
     if (authData.ok && payload.ok) setMyAuthData(authData);
     else router.push("/");
+    console.log(payload)
   }, []);
 
   useEffect(() => {
@@ -27,12 +30,32 @@ const Subject = ({ authData, payload }) => {
 
   const loadQuestion = async () => {
     try {
-       console.log(questionData)     
-       setQuestionData("")
+      dispatch({
+        type: "SETISLOADING",
+        payload: { isLoading: true },
+      });
+      console.log(state)
+      const { ok, message } = await blogWorker.postNewSubjectQuestion({
+        action: "POSTNEWQUESTION",
+        payload: {
+          subject: payload.data.subject,
+          question: questionData,
+          author: state.data._id,
+        },
+      });
+      if (ok) {
+        alert(message);
+        router.reload();
+      } else setErrorData(message);
     } catch (error) {
-      
+      setErrorData(error.message);
+    } finally {
+      dispatch({
+        type: "SETISLOADING",
+        payload: { IsLoading: false },
+      });
     }
-  }
+  };
 
   return (
     <div className="w-full">
@@ -41,22 +64,25 @@ const Subject = ({ authData, payload }) => {
       </h2>
       <siv className="w-full flex flex-wrap items-center justify-evenly pt-5">
         {payload.data.information.questions.map((question) => (
-          <QuestionCard author={question.author} question={question.question} />
+          <QuestionCard author={question.author} question={question.question} action = {() => router.push(`/Dashboard/Subject/${question._id}`)} />
         ))}
       </siv>
       <div className="w-full flex justify-center items-center mb-2 ">
         <input
           type="text"
           placeholder="Write any question"
-          value = {questionData}
-          onChange={e => setQuestionData(e.target.value)}
+          value={questionData}
+          onChange={(e) => setQuestionData(e.target.value)}
           className="shadow appearance-none border rounded w-2/5 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
-        <button onClick={loadQuestion} className="bg-teal-500 text-white font-bold px-7 py-3  ml-2 shadow-xl rounded-xl">
+        <button
+          onClick={loadQuestion}
+          className="bg-teal-500 text-white font-bold px-7 py-3  ml-2 shadow-xl rounded-xl"
+        >
           Add
         </button>
       </div>
-      <Loading/>
+      {state.isLoading && <Loading/>}
       <button
         className="bg-sky-600 text-white font-bold px-7 py-3 mt-4 ml-2 shadow-xl rounded-xl"
         onClick={() => router.push("/Dashboard")}
