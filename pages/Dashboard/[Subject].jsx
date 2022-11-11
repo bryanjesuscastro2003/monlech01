@@ -6,7 +6,7 @@ import FetchingBlog from "../../fetching/blogClass";
 import FetchingAuth from "../../fetching/authClass";
 import QuestionCard from "../../components/QuestionCard";
 import Loading from "../../components/Loading";
-
+     
 const Subject = ({ authData, payload }) => {
   const { state, dispatch } = useContext(Context);
   const [myAuthData, setMyAuthData] = useState({});
@@ -33,8 +33,7 @@ const Subject = ({ authData, payload }) => {
         type: "SETISLOADING",
         payload: { isLoading: true },
       });
-      console.log(state)
-      const { ok, message } = await blogWorker.postNewSubjectQuestion({
+      const { ok, message } = await blogWorker.postSubjectData({
         action: "POSTNEWQUESTION",
         payload: {
           subject: payload.data.subject,

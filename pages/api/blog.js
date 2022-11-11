@@ -9,6 +9,7 @@ const blog = async (req, res) => {
       ...req.body,
     };
     let response = null;
+    console.log(payload)
     await subjectWorker.loadInitialSubjects();
     switch (action.toUpperCase()) {
       case "GETALLSUBJECT":

@@ -26,7 +26,7 @@ class FetchingBlog {
     }
   };
 
-  postNewSubjectQuestion = async (data) => {
+  postSubjectData = async (data) => {
     try {
       this.data = await fetch(this.apiUrl, {
         ...this.defaultConfigFetch,

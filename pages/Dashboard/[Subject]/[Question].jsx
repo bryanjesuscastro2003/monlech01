@@ -10,13 +10,15 @@ import ResponseCard from "../../../components/ResponseCard";
 const Question = ({ authData, payload }) => {
   const { state, dispatch } = useContext(Context);
   const [myAuthData, setMyAuthData] = useState({});
+  const [errorData, setErrorData] = useState("");
+  const blogWorker = new FetchingBlog(blogEndpoint);
   const [responseData, setResponseData] = useState("");
   const router = useRouter();
+  const {Question, Subject} = router.query
 
   useEffect(() => {
     if (authData.ok && payload.ok) setMyAuthData(authData);
     else router.push("/");
-    console.log(payload);
   }, []);
 
   useEffect(() => {
@@ -25,6 +27,37 @@ const Question = ({ authData, payload }) => {
       payload: myAuthData,
     });
   }, [myAuthData]);
+
+
+  const loadResponse = async () => {
+       try {
+        console.log("bA")
+        dispatch({
+          type: "SETISLOADING",
+          payload: { isLoading: true },
+        });
+        const {ok, message}= await blogWorker.postSubjectData({
+          action: "POSTNEWRESPONSE",
+          payload: {
+            subject: Subject,
+            _id: Question,
+            response : responseData,
+            author: state.data._id,
+          },
+        });
+        if (ok) {
+          alert(message);
+          router.reload();
+        } else setErrorData(message);
+       } catch (error) {
+        setErrorData(error.message);
+       }finally{
+        dispatch({
+          type: "SETISLOADING",
+          payload: { isLoading: false },
+        });
+       }
+  }
 
   return (
     <div className="w-full flex flex-col items-center justify-center pt-5">
@@ -47,7 +80,7 @@ const Question = ({ authData, payload }) => {
           className="shadow appearance-none border rounded w-2/5 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
         <button
-          onClick={() => console.log(responseData)}
+          onClick={loadResponse}
           className="bg-teal-500 text-white font-bold px-7 py-3  ml-2 shadow-xl rounded-xl"
         >
           Add
