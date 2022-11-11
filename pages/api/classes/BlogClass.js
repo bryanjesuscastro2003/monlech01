@@ -60,7 +60,7 @@ class SubjectBlog extends ConnectionDb {
    * @param {action} "new question , new response"
    * @param {payload} {subjectName : "" , type : "question", mainData : "your information", author : your id }
    */
-  postNewData = async ({ action, payload }) => {
+  postNewQuestion = async ( payload ) => {
     try {
       const data = {
         question: payload.question,
@@ -86,6 +86,39 @@ class SubjectBlog extends ConnectionDb {
       return this.response;
     }
   };
+  postNewResponse = async (payload) => {
+     try {
+           const data = {
+                    author : payload.author,
+                    response : payload.response
+           }
+           let subject = await this.model.findOne({ subjectName: payload.subject.toLowerCase() });
+           if (!Boolean(subject)) throw new Error("Such subject is not available");
+           let index = 0, question = null
+           while (index < subject.questions.length) {
+                  console.log(subject.questions[index]._id)
+                 if(subject.questions[index]._id.toString() === payload._id){
+                      subject.questions[index].responses.push(data)
+                      await subject.save()
+                      question = subject.questions[index]
+                      break
+                 }
+                 index +=  1
+           }
+          return this.response = {
+              ok : true,
+              message : "Your question is ready" ,
+              data : question     
+           }
+     } catch (error) {
+      console.log(error)
+      return this.response = {
+        ok : false,
+        message : "Unexpected error try again later" ,
+        data : null    
+     }
+     }
+  }
 }
 
 export default SubjectBlog;

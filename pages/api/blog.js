@@ -12,8 +12,11 @@ const blog = async (req, res) => {
            response = await subjectWorker.getAllData(payload.subject || null)
            break;
       case "POSTNEWQUESTION":
-          response = await subjectWorker.postNewData({action, payload}) 
+          response = await subjectWorker.postNewQuestion(payload) 
       break;
+      case "POSTNEWRESPONSE":
+          response = await subjectWorker.postNewResponse(payload)
+      break
     }
     res.status(200).json(response)
   } catch (error) {
