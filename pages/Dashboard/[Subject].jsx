@@ -13,7 +13,6 @@ const Subject = ({ authData, payload }) => {
   useEffect(() => {
     if (authData.ok && payload.ok) setMyAuthData(authData);
     else router.push("/");
-    console.log(payload)
   }, []);
 
   useEffect(() => {
@@ -26,7 +25,7 @@ const Subject = ({ authData, payload }) => {
   return (
     <div className="w-full">
       <h2 className="font-bold text-3xl text-center">
-        Subject : {payload.data.subject}{" "}
+        Subject : {payload.data.subject}
       </h2>
     </div>
   );

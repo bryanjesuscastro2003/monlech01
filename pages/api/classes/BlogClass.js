@@ -67,9 +67,10 @@ class SubjectBlog extends ConnectionDb {
         author: payload.author,
         responses: [],
       };
-      let subject = await this.model.findOne({ subjectName: payload.subject });
+      let subject = await this.model.findOne({ subjectName: payload.subject.toLowerCase() });
       if (!Boolean(subject)) throw new Error("Such subject is not available");
-      await subject.questions.push(data);
+      subject.questions.push(data);
+      await subject.save();
       this.response = {
         ok: true,
         message: "Your question was successfully added",

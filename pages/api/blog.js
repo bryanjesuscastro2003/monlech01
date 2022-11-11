@@ -9,11 +9,15 @@ const blog = async (req, res) => {
     await subjectWorker.loadInitialSubjects()
     switch (action) {
       case "GETALLSUBJECT":
-           response =await subjectWorker.getAllData(payload.subject || null)
+           response = await subjectWorker.getAllData(payload.subject || null)
+           break;
+      case "POSTNEWQUESTION":
+          response = await subjectWorker.postNewData({action, payload}) 
+      break;
     }
     res.status(200).json(response)
   } catch (error) {
-    res.send("Test");
+    res.status(400).json({ok : false, message : "Unexpected error try again later ", data : []})
   }
 };
 
