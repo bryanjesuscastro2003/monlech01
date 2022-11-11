@@ -22,25 +22,18 @@ class FetchingBlog {
       }).then((res) => res.json());
       return this.data;
     } catch (error) {
-      return null;
+      return { ok: false, message: "Unexpected error please try again later" };
     }
   };
-  aboutData = async (data) => {
+  postNewSubjectQuestion = async (data) => {
     try {
-      const { action, payload } = data;
       this.data = await fetch(this.apiUrl, {
         ...this.defaultConfigFetch,
-        method: "GET",
-        body: JSON.stringify({
-          action,
-          payload,
-        }),
+        body: JSON.stringify(data),
       }).then((res) => res.json());
-      console.log("Vamos");
       return this.data;
     } catch (error) {
-      console.log(error);
-      return null;
+      return { ok: false, message: "Unexpected error please try again later" };
     }
   };
 }

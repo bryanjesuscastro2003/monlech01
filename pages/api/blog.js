@@ -7,7 +7,7 @@ const blog = async (req, res) => {
     const { action, payload } = {...{action : req.query.action, payload : {subject : req.query.payload}}, ...req.body};
     let response = null
     await subjectWorker.loadInitialSubjects()
-    switch (action) {
+    switch (action.toUpperCase()) {
       case "GETALLSUBJECT":
            response = await subjectWorker.getAllData(payload.subject || null)
            break;

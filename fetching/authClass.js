@@ -23,7 +23,7 @@ class FetchingAuth {
       }).then(res => res.json());
       return this.data;
     } catch (error) {
-      return null;
+      return {ok : false, loggedIn : false, message : "Unexpected error please try again later"};
     }
   };
   signUp = async (data) => {
@@ -37,7 +37,7 @@ class FetchingAuth {
       }).then(res => res.json());
       return this.data;
     } catch (error) {
-      return null;
+      return {ok : false, loggedIn : false, message : "Unexpected error please try again later"};
     }
   };
   getInfoJWT = async (token) => {
@@ -51,7 +51,7 @@ class FetchingAuth {
       }).then(res => res.json());
       return this.data;
     } catch (error) {
-      return null;
+      return {ok : false, message : "Unexpected error please try again later"};
     }
   };
 }
