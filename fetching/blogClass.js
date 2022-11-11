@@ -19,7 +19,6 @@ class FetchingBlog {
       this.data = await fetch(this.apiUrl + query, {
         ...this.defaultConfigFetch,
         method: "GET",
-        query: { action, payload },
       }).then((res) => res.json());
       return this.data;
     } catch (error) {

@@ -5,7 +5,7 @@ import { blogEndpoint, authEndpoint } from "../../endpoints/index";
 import FetchingBlog from "../../fetching/blogClass";
 import FetchingAuth from "../../fetching/authClass";
 
-const Subject = ({ authData }) => {
+const Subject = ({ authData, payload }) => {
   const { state, dispatch } = useContext(Context);
   const [myAuthData, setMyAuthData] = useState({});
   const router = useRouter();
@@ -36,12 +36,14 @@ export const getServerSideProps = async ({ req, res }) => {
   try {
     const authWorker = new FetchingAuth(authEndpoint);
     //const blogWorker = new FetchingBlog(blogEndpoint);
+    //const context = {req, res}
 
     const responseAuth = await authWorker.getInfoJWT(req.cookies.userMonlech);
     /*const response = await blogWorker.getSubjectData({
       action: "GETALLSUBJECT",
       payload: context.params.Subject,
     });*/
+    //console.log(response)
     return { props: { authData: responseAuth, payload: {} } };
   } catch (error) {
     console.log(error);
