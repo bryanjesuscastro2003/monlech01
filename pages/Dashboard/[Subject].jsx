@@ -11,8 +11,9 @@ const Subject = ({ authData, payload }) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (authData.ok) setMyAuthData(authData);
+    if (authData.ok && payload.ok) setMyAuthData(authData);
     else router.push("/");
+    console.log(payload)
   }, []);
 
   useEffect(() => {
@@ -25,26 +26,22 @@ const Subject = ({ authData, payload }) => {
   return (
     <div className="w-full">
       <h2 className="font-bold text-3xl text-center">
-        {" "}
-        {/*Subject : {payload.data.subject}{" "}*/}
+        Subject : {payload.data.subject}{" "}
       </h2>
     </div>
   );
 };
 
-export const getServerSideProps = async ({ req, res }) => {
+export const getServerSideProps = async (context) => {
   try {
     const authWorker = new FetchingAuth(authEndpoint);
     const blogWorker = new FetchingBlog(blogEndpoint);
-    //const context = {req, res}
-
-    const responseAuth = await authWorker.getInfoJWT(req.cookies.userMonlech);
-    /*const response = await blogWorker.getSubjectData({
+    const responseAuth = await authWorker.getInfoJWT(context.req.cookies.userMonlech);
+    const response = await blogWorker.getSubjectData({
       action: "GETALLSUBJECT",
       payload: context.params.Subject,
-    });*/
-    //console.log(response)
-    return { props: { authData: responseAuth, payload: {} } };
+    });
+    return { props: { authData: responseAuth, payload: response } };
   } catch (error) {
     console.log(error);
     return { props: { data: {} } };

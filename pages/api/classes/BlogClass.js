@@ -35,7 +35,7 @@ class SubjectBlog extends ConnectionDb {
   getAllData = async (subject = null) => {
     try {
       this.data = Boolean(subject)
-        ? await this.model.find({ subjectName: subject })
+        ? await this.model.findOne({ subjectName: subject.toLowerCase() })
         : await this.model.find();
       this.response = {
         ok: true,
