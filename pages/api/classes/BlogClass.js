@@ -78,7 +78,7 @@ class SubjectBlog extends ConnectionDb {
             index += 1;
           }
           return this.response = {
-             ok : false, 
+             ok : true, 
              message : "Subject questions loaded successfully",
              data : question
           }
@@ -86,7 +86,7 @@ class SubjectBlog extends ConnectionDb {
       } catch (error) {
         return this.response = {
           ok: false,
-          message: this.error.message,
+          message: error.message,
           data: [],
         };
       }

@@ -18,7 +18,6 @@ const Subject = ({ authData, payload }) => {
   useEffect(() => {
     if (authData.ok && payload.ok) setMyAuthData(authData);
     else router.push("/");
-    console.log(payload)
   }, []);
 
   useEffect(() => {
@@ -64,7 +63,7 @@ const Subject = ({ authData, payload }) => {
       </h2>
       <siv className="w-full flex flex-wrap items-center justify-evenly pt-5">
         {payload.data.information.questions.map((question) => (
-          <QuestionCard author={question.author} question={question.question} action = {() => router.push(`/Dashboard/Subject/${question._id}`)} />
+          <QuestionCard author={question.author} question={question.question} action = {() => router.push(`/Dashboard/${payload.data.subject}/${question._id}`)} />
         ))}
       </siv>
       <div className="w-full flex justify-center items-center mb-2 ">
@@ -106,7 +105,6 @@ export const getServerSideProps = async (context) => {
     });
     return { props: { authData: responseAuth, payload: response } };
   } catch (error) {
-    console.log(error);
     return { props: { data: {} } };
   }
 };
