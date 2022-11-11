@@ -6,6 +6,7 @@ class SubjectBlog extends ConnectionDb {
     super();
     this.model = SubjectModel;
     this.data = {};
+    this.subjectQuestion = {} 
     this.response = {
       ok: false,
       message: "",
@@ -55,20 +56,54 @@ class SubjectBlog extends ConnectionDb {
       return this.response;
     }
   };
+  findSubject = async (subjectName) => {
+       try {
+           const subject = await this.model.findOne({
+               subjectName: subjectName.toLowerCase(),
+            });
+            if (!Boolean(subject)) throw new Error("Such subject is not available");
+            return subject
+       } catch (error) {throw error}
+  }
+  getSubjectQuestion = async (payload) => {
+      try {
+            const subject = await this.findSubject(payload.subject)
+            let index = 0,
+            question = null;
+          while (index < subject.questions.length) {
+            if (subject.questions[index]._id.toString() === payload.question) {
+              question = subject.questions[index];
+              break;
+            }
+            index += 1;
+          }
+          return this.response = {
+             ok : false, 
+             message : "Subject questions loaded successfully",
+             data : question
+          }
+
+      } catch (error) {
+        return this.response = {
+          ok: false,
+          message: this.error.message,
+          data: [],
+        };
+      }
+  };
   /**
    *
    * @param {action} "new question , new response"
    * @param {payload} {subjectName : "" , type : "question", mainData : "your information", author : your id }
    */
-  postNewQuestion = async ( payload ) => {
+  postNewQuestion = async (payload) => {
     try {
       const data = {
         question: payload.question,
         author: payload.author,
         responses: [],
       };
-      let subject = await this.model.findOne({ subjectName: payload.subject.toLowerCase() });
-      if (!Boolean(subject)) throw new Error("Such subject is not available");
+      let subject = await this.findSubject(payload.subject)
       subject.questions.push(data);
       await subject.save();
       this.response = {
@@ -87,38 +122,39 @@ class SubjectBlog extends ConnectionDb {
     }
   };
   postNewResponse = async (payload) => {
-     try {
-           const data = {
-                    author : payload.author,
-                    response : payload.response
-           }
-           let subject = await this.model.findOne({ subjectName: payload.subject.toLowerCase() });
-           if (!Boolean(subject)) throw new Error("Such subject is not available");
-           let index = 0, question = null
-           while (index < subject.questions.length) {
-                  console.log(subject.questions[index]._id)
-                 if(subject.questions[index]._id.toString() === payload._id){
-                      subject.questions[index].responses.push(data)
-                      await subject.save()
-                      question = subject.questions[index]
-                      break
-                 }
-                 index +=  1
-           }
-          return this.response = {
-              ok : true,
-              message : "Your question is ready" ,
-              data : question     
-           }
-     } catch (error) {
-      console.log(error)
-      return this.response = {
-        ok : false,
-        message : "Unexpected error try again later" ,
-        data : null    
-     }
-     }
-  }
+    try {
+      const data = {
+        author: payload.author,
+        response: payload.response,
+      };
+      let subject = await this.model.findOne({
+        subjectName: payload.subject.toLowerCase(),
+      });
+      if (!Boolean(subject)) throw new Error("Such subject is not available");
+      let index = 0,
+        question = null;
+      while (index < subject.questions.length) {
+        if (subject.questions[index]._id.toString() === payload._id) {
+          subject.questions[index].responses.push(data);
+          await subject.save();
+          question = subject.questions[index];
+          break;
+        }
+        index += 1;
+      }
+      return (this.response = {
+        ok: true,
+        message: "Your response has been saved successfully",
+        data: question,
+      });
+    } catch (error) {
+      return (this.response = {
+        ok: false,
+        message: "Unexpected error try again later",
+        data: null,
+      });
+    }
+  };
 }
 
 export default SubjectBlog;
