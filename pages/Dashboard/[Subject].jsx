@@ -35,7 +35,7 @@ const Subject = ({ authData, payload }) => {
 export const getServerSideProps = async ({ req, res }) => {
   try {
     const authWorker = new FetchingAuth(authEndpoint);
-    //const blogWorker = new FetchingBlog(blogEndpoint);
+    const blogWorker = new FetchingBlog(blogEndpoint);
     //const context = {req, res}
 
     const responseAuth = await authWorker.getInfoJWT(req.cookies.userMonlech);
