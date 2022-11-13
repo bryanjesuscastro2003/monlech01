@@ -79,6 +79,7 @@ class SubjectBlog extends ConnectionDb {
         }
         index += 1;
       }
+      if (!Boolean(question)) throw new Error("Such question is not available");
       return (this.response = {
         ok: true,
         message: "Subject questions loaded successfully",
@@ -88,7 +89,7 @@ class SubjectBlog extends ConnectionDb {
       return (this.response = {
         ok: false,
         message: error.message,
-        data: [],
+        data: { responses: [] },
       });
     }
   };
@@ -104,7 +105,7 @@ class SubjectBlog extends ConnectionDb {
         author: payload.author,
         responses: [],
       };
-      let subject = await this.findSubject(payload.subject);
+      let subject = await this.findSubject(payload.subject.toLowerCase());
       subject.questions.push(data);
       await subject.save();
       this.response = {
@@ -161,7 +162,7 @@ class SubjectBlog extends ConnectionDb {
     try {
       const { subject, questionID, value } = payload;
       const partialResponse = await this.model.findOne({
-        subjectName: subject,
+        subjectName: subject.toLowerCase(),
       });
       let myQuestion = null,
         index = 0;
@@ -178,7 +179,8 @@ class SubjectBlog extends ConnectionDb {
       const questionListUpdated = partialResponse.questions.filter(
         (question) => question._id.toString() !== questionID
       );
-      partialResponse.questions = questionListUpdated.push(myQuestion);
+      partialResponse.questions = questionListUpdated;
+      partialResponse.questions.push(myQuestion);
       await partialResponse.save();
       return (this.response = {
         ok: true,
@@ -198,7 +200,7 @@ class SubjectBlog extends ConnectionDb {
     try {
       const { subject } = payload;
       const partialResponse = await this.model.findOne({
-        subjectName: subject,
+        subjectName: subject.toLowerCase(),
       });
       const questionListUpdated = partialResponse.questions.filter(
         (question) => question._id.toString() !== payload.question

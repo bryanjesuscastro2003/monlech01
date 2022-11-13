@@ -55,13 +55,43 @@ const Subject = ({ authData, payload }) => {
     }
   };
 
-  const deleteQuestion = (_id) => {
-    console.log(_id, "question delete")
-  }
- 
-  const updateQuestion = (_id) => {
-    console.log(_id, "question updating")
-  }
+  const deleteQuestion = async (_id) => {
+    try {
+      if(!confirm("Are you sure you want to delete this question?")) return
+      const data = {
+        action: "DELETEQUESTION",
+        payload: payload.data.subject,
+        questionID: _id,
+      };
+      const response = await blogWorker.deleteSubjectQuestion(data);
+      if (response.ok) {
+        alert("Question removed successfully");
+        router.reload();
+      }
+    } catch (error) {}
+  };
+
+  const updateQuestion = async (_id) => {
+    try {
+      if(questionData==="") alert("Please enter a question value!");
+      else if(!confirm("Are you sure you want to modify this question?")) return
+      else{
+        const data = {
+          action: "UPDATEQUESTION",
+          payload: {
+              subject : payload.data.subject,
+              questionID: _id,
+              value : questionData
+            },
+        };
+        const response = await blogWorker.updateSubjectQuestion(data);
+        if (response.ok) {
+          alert("Question updated successfully");
+          router.reload();
+        }
+      }
+    } catch (error) {}
+  };
 
   return (
     <div className="w-full">
@@ -86,15 +116,15 @@ const Subject = ({ authData, payload }) => {
       <siv className="w-full flex flex-wrap items-center justify-evenly pt-5">
         {payload.data.information.questions.map((question) => (
           <QuestionCard
-            key = {question._id}
-            _id = {question._id}
+            key={question._id}
+            _id={question._id}
             author={question.author}
             question={question.question}
             action={() =>
               router.push(`/Dashboard/${payload.data.subject}/${question._id}`)
             }
-            updateMethod = {updateQuestion}
-            deleteMethod = {deleteQuestion}
+            updateMethod={updateQuestion}
+            deleteMethod={deleteQuestion}
           />
         ))}
       </siv>
