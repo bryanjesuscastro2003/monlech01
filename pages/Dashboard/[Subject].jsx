@@ -6,7 +6,7 @@ import FetchingBlog from "../../fetching/blogClass";
 import FetchingAuth from "../../fetching/authClass";
 import QuestionCard from "../../components/QuestionCard";
 import Loading from "../../components/Loading";
-     
+
 const Subject = ({ authData, payload }) => {
   const { state, dispatch } = useContext(Context);
   const [myAuthData, setMyAuthData] = useState({});
@@ -55,16 +55,19 @@ const Subject = ({ authData, payload }) => {
     }
   };
 
+  const deleteQuestion = (_id) => {
+    console.log(_id, "question delete")
+  }
+ 
+  const updateQuestion = (_id) => {
+    console.log(_id, "question updating")
+  }
+
   return (
     <div className="w-full">
       <h2 className="font-bold text-3xl text-center">
         Subject : {payload.data.subject}
       </h2>
-      <siv className="w-full flex flex-wrap items-center justify-evenly pt-5">
-        {payload.data.information.questions.map((question) => (
-          <QuestionCard author={question.author} question={question.question} action = {() => router.push(`/Dashboard/${payload.data.subject}/${question._id}`)} />
-        ))}
-      </siv>
       <div className="w-full flex justify-center items-center mb-2 ">
         <input
           type="text"
@@ -80,7 +83,23 @@ const Subject = ({ authData, payload }) => {
           Add
         </button>
       </div>
-      {state.isLoading && <Loading/>}
+      <siv className="w-full flex flex-wrap items-center justify-evenly pt-5">
+        {payload.data.information.questions.map((question) => (
+          <QuestionCard
+            key = {question._id}
+            _id = {question._id}
+            author={question.author}
+            question={question.question}
+            action={() =>
+              router.push(`/Dashboard/${payload.data.subject}/${question._id}`)
+            }
+            updateMethod = {updateQuestion}
+            deleteMethod = {deleteQuestion}
+          />
+        ))}
+      </siv>
+
+      {state.isLoading && <Loading />}
       <button
         className="bg-sky-600 text-white font-bold px-7 py-3 mt-4 ml-2 shadow-xl rounded-xl"
         onClick={() => router.push("/Dashboard")}

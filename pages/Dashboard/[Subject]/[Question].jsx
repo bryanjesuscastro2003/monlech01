@@ -14,7 +14,7 @@ const Question = ({ authData, payload }) => {
   const blogWorker = new FetchingBlog(blogEndpoint);
   const [responseData, setResponseData] = useState("");
   const router = useRouter();
-  const {Question, Subject} = router.query
+  const { Question, Subject } = router.query;
 
   useEffect(() => {
     if (authData.ok && payload.ok) setMyAuthData(authData);
@@ -28,50 +28,68 @@ const Question = ({ authData, payload }) => {
     });
   }, [myAuthData]);
 
-
   const loadResponse = async () => {
-       try {
-        console.log("bA")
-        dispatch({
-          type: "SETISLOADING",
-          payload: { isLoading: true },
-        });
-        const {ok, message}= await blogWorker.postSubjectData({
-          action: "POSTNEWRESPONSE",
-          payload: {
-            subject: Subject,
-            _id: Question,
-            response : responseData,
-            author: state.data._id,
-          },
-        });
-        if (ok) {
-          alert(message);
-          router.reload();
-        } else setErrorData(message);
-       } catch (error) {
-        setErrorData(error.message);
-       }finally{
-        dispatch({
-          type: "SETISLOADING",
-          payload: { isLoading: false },
-        });
-       }
+    try {
+      console.log("bA");
+      dispatch({
+        type: "SETISLOADING",
+        payload: { isLoading: true },
+      });
+      const { ok, message } = await blogWorker.postSubjectData({
+        action: "POSTNEWRESPONSE",
+        payload: {
+          subject: Subject,
+          _id: Question,
+          response: responseData,
+          author: state.data._id,
+        },
+      });
+      if (ok) {
+        alert(message);
+        router.reload();
+      } else setErrorData(message);
+    } catch (error) {
+      setErrorData(error.message);
+    } finally {
+      dispatch({
+        type: "SETISLOADING",
+        payload: { isLoading: false },
+      });
+    }
+  };
+
+  const deleteQuestion = (_id) => {
+    console.log(_id, "question delete");
+  };
+
+  const updateQuestion = (_id) => {
+    console.log(_id, "question updating");
+  };
+
+
+  const deleteResponse = (_id) => {
+    console.log(_id, "response deleting");
+  };
+
+  const updateResponse = (_id) => { 
+    console.log(_id, "response updating");
   }
 
   return (
     <div className="w-full flex flex-col items-center justify-center pt-5">
       <h3 className="font-bold text-3xl">Question </h3>
+
       <QuestionCard
         author={payload.data.author}
         question={payload.data.question}
+        key={payload.data._id}
+        _id={payload.data._id}
         action={() => console.log("")}
+        updateMethod={updateQuestion}
+        deleteMethod={deleteQuestion}
       />
       <h3 className="font-bold text-3xl">Responses</h3>
-      {payload.data.responses.map((response) => (
-        <ResponseCard author={response.author} response={response.response} />
-      ))}
-      <div className="w-full flex justify-center items-center mb-2 ">
+      <div className="w-full flex justify-center items-center mb-5 ">
         <input
           type="text"
           placeholder="Write your response"
@@ -86,6 +104,17 @@ const Question = ({ authData, payload }) => {
           Add
         </button>
       </div>
+      {payload.data.responses.map((response) => (
+        <ResponseCard
+          key={response._id}
+          _id={response._id}
+          author={response.author}
+          response={response.response}
+          updateMethod={updateResponse}
+          deleteMethod={deleteResponse}
+        />
+      ))}
+
       <button
         className="bg-sky-600 text-white font-bold px-7 py-3 mt-4 ml-2 shadow-xl rounded-xl"
         onClick={() => router.back()}
