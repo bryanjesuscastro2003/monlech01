@@ -104,7 +104,6 @@ export default function Home() {
       }
     } catch (error) {}
   };
-
   return (
     <div className="w-full  min-h-screen  flex-col justify-center items-center">
       <main className="w-full flex justify-center mt-5">

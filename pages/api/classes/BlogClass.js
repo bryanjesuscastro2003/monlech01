@@ -6,7 +6,7 @@ class SubjectBlog extends ConnectionDb {
     super();
     this.model = SubjectModel;
     this.data = {};
-    this.subjectQuestion = {} 
+    this.subjectQuestion = {};
     this.response = {
       ok: false,
       message: "",
@@ -57,39 +57,40 @@ class SubjectBlog extends ConnectionDb {
     }
   };
   findSubject = async (subjectName) => {
-       try {
-           const subject = await this.model.findOne({
-               subjectName: subjectName.toLowerCase(),
-            });
-            if (!Boolean(subject)) throw new Error("Such subject is not available");
-            return subject
-       } catch (error) {throw error}
-  }
+    try {
+      const subject = await this.model.findOne({
+        subjectName: subjectName.toLowerCase(),
+      });
+      if (!Boolean(subject)) throw new Error("Such subject is not available");
+      return subject;
+    } catch (error) {
+      throw error;
+    }
+  };
   getSubjectQuestion = async (payload) => {
-      try {
-            const subject = await this.findSubject(payload.subject)
-            let index = 0,
-            question = null;
-          while (index < subject.questions.length) {
-            if (subject.questions[index]._id.toString() === payload.question) {
-              question = subject.questions[index];
-              break;
-            }
-            index += 1;
-          }
-          return this.response = {
-             ok : true, 
-             message : "Subject questions loaded successfully",
-             data : question
-          }
-
-      } catch (error) {
-        return this.response = {
-          ok: false,
-          message: error.message,
-          data: [],
-        };
+    try {
+      const subject = await this.findSubject(payload.subject);
+      let index = 0,
+        question = null;
+      while (index < subject.questions.length) {
+        if (subject.questions[index]._id.toString() === payload.question) {
+          question = subject.questions[index];
+          break;
+        }
+        index += 1;
       }
+      return (this.response = {
+        ok: true,
+        message: "Subject questions loaded successfully",
+        data: question,
+      });
+    } catch (error) {
+      return (this.response = {
+        ok: false,
+        message: error.message,
+        data: [],
+      });
+    }
   };
   /**
    *
@@ -103,7 +104,7 @@ class SubjectBlog extends ConnectionDb {
         author: payload.author,
         responses: [],
       };
-      let subject = await this.findSubject(payload.subject)
+      let subject = await this.findSubject(payload.subject);
       subject.questions.push(data);
       await subject.save();
       this.response = {
@@ -146,6 +147,68 @@ class SubjectBlog extends ConnectionDb {
         ok: true,
         message: "Your response has been saved successfully",
         data: question,
+      });
+    } catch (error) {
+      return (this.response = {
+        ok: false,
+        message: "Unexpected error try again later",
+        data: null,
+      });
+    }
+  };
+
+  updateQuestion = async (payload) => {
+    try {
+      const { subject, questionID, value } = payload;
+      const partialResponse = await this.model.findOne({
+        subjectName: subject,
+      });
+      let myQuestion = null,
+        index = 0;
+      while (index < partialResponse.questions.length) {
+        if (partialResponse.questions[index]._id.toString() === questionID) {
+          myQuestion = {
+            ...partialResponse.questions[index]._doc,
+            question: value,
+          };
+          break;
+        }
+        index++;
+      }
+      const questionListUpdated = partialResponse.questions.filter(
+        (question) => question._id.toString() !== questionID
+      );
+      partialResponse.questions = questionListUpdated.push(myQuestion);
+      await partialResponse.save();
+      return (this.response = {
+        ok: true,
+        message: "Your questions has been updated",
+        data: null,
+      });
+    } catch (error) {
+      return (this.response = {
+        ok: false,
+        message: "Unexpected error try again later",
+        data: null,
+      });
+    }
+  };
+
+  deleteQuestion = async (payload) => {
+    try {
+      const { subject } = payload;
+      const partialResponse = await this.model.findOne({
+        subjectName: subject,
+      });
+      const questionListUpdated = partialResponse.questions.filter(
+        (question) => question._id.toString() !== payload.question
+      );
+      partialResponse.questions = questionListUpdated;
+      await partialResponse.save();
+      return (this.response = {
+        ok: true,
+        message: "Your question has been removed",
+        data: null,
       });
     } catch (error) {
       return (this.response = {

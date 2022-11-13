@@ -5,11 +5,13 @@ const subjectWorker = new SubjectBlog();
 const blog = async (req, res) => {
   try {
     const { action, payload } = {
-      ...{ action: req.query.action, payload: { subject: req.query.payload, question: req.query.question} },
+      ...{
+        action: req.query.action,
+        payload: { subject: req.query.payload, question: req.query.question },
+      },
       ...req.body,
     };
     let response = null;
-    console.log(payload)
     await subjectWorker.loadInitialSubjects();
     switch (action.toUpperCase()) {
       case "GETALLSUBJECT":
@@ -24,16 +26,22 @@ const blog = async (req, res) => {
       case "POSTNEWRESPONSE":
         response = await subjectWorker.postNewResponse(payload);
         break;
+      case "UPDATEQUESTION":
+        response = await subjectWorker.updateQuestion(payload);
+        break;
+      case "DELETEQUESTION":
+        response = await subjectWorker.deleteQuestion(payload);
+        break;
+      default:
+        throw new Error("Unexpected response");
     }
     res.status(200).json(response);
   } catch (error) {
-    res
-      .status(400)
-      .json({
-        ok: false,
-        message: `Unexpected error try again later `,
-        data: [],
-      });
+    res.status(400).json({
+      ok: false,
+      message: `Unexpected error try again later `,
+      data: [],
+    });
   }
 };
 
