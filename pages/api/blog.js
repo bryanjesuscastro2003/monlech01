@@ -7,7 +7,11 @@ const blog = async (req, res) => {
     const { action, payload } = {
       ...{
         action: req.query.action,
-        payload: { subject: req.query.payload, question: req.query.question },
+        payload: {
+          subject: req.query.payload,
+          question: req.query.question,
+          response: req.query.response || "none",
+        },
       },
       ...req.body,
     };
@@ -32,8 +36,14 @@ const blog = async (req, res) => {
       case "DELETEQUESTION":
         response = await subjectWorker.deleteQuestion(payload);
         break;
+      case "UPDATERESPONSE":
+          response = await subjectWorker.updateQuestionResponse(payload);
+          break;
+      case "DELETERESPONSE":
+        response = await subjectWorker.deleteQuestionResponse(payload);
+        break;
       default:
-        throw new Error("Unexpected response");
+        throw new Error("");
     }
     res.status(200).json(response);
   } catch (error) {
